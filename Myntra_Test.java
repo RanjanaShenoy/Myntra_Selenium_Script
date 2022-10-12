@@ -5,405 +5,532 @@
 
 
 
-package Myntra;
+package combinedcode;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
+import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+//import org.apache.logging.log4j.Logger;
 
-public class Myntra_Test {
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import pages.AddToCart;
+import pages.Dashboard;
+import pages.Filters;
+import pages.HelpCenter;
+import pages.LoginPage;
+import pages.Logout;
+import pages.MyOrders;
+import pages.MyProfile;
+import pages.PlaceOrder;
+import pages.SearchBar;
+import pages.Wishlist;
+import tests.TestDashboard;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class IntegratedCode {
+	
 	WebDriver driver;
-    String url="https://www.myntra.com/";
-    String orders_url="https://www.myntra.com/my/orders";
-    String login_url="https://www.myntra.com/login?referer=https://www.myntra.com/";
-    public static String wishlistUrl = "https://www.myntra.com/12196028";
-    public static String wishlistUrl1 = "https://www.myntra.com/17270154";
-    public static String contact_us_url="https://www.myntra.com/contactus";
-        public static String heading, items;
-        boolean optionsDisplayed = false;
-        boolean isHintText;
-        boolean isTextInCorrectBrandName = false;
-        boolean headPresent;
-        public static String HeadLine;
-        
-        public static String query,query1,query2,query3,query4,result1,result2;
-        public static boolean chat=false;
-        public static boolean callNow=false;
-        public static boolean writeToUs=false;
-        public static boolean chat1=false;
-        
-        String errText;
-        String incorrectBrandName;
-        String profileHead;
-        
+	String url="https://www.myntra.com/";
+	
+	WebDriverPage web;
+	boolean value1;	
+	String value2;
+	public static String title,count,title1,count1,title2,count2,title3,count3;
+	String header,text1,text2,text3,text4;
+	boolean chat,callNow,writeToUs;
+	int ButtonCount;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(IntegratedCode.class.getName());
+	
+	MyOrders order;
+	AddToCart a;
+	Filters f;
+	HelpCenter help;
+	LoginPage login;
+	Logout logOut;
+	MyProfile myprofile;
+	PlaceOrder place;
+	SearchBar sbp;
+	Wishlist w;
+	Dashboard dashboard;
+	
+	
 	@BeforeTest
-	public void setUp() throws InterruptedException {
-		System.setProperty("webdriver.chrome.driver", "C:\\Users\\sarika_bote\\eclipse-workspace\\New\\library\\chromedriver.exe");
-		driver=new ChromeDriver();
-		driver.manage().window().maximize();
-	
-	}
-	
-	//Login
-	@Parameters({"id","password"})
+	  public void test() {
+		
+			web=new WebDriverPage(driver);
+			driver=web.setBrowser("firefox");
+
+			driver.manage().window().maximize();
+			//driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+			driver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
+			
+			log.info("-----Test Started-----");
+			test=new TestReadExcel();
+	        try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			order=new MyOrders(driver);
+			a=new AddToCart(driver);
+			f=new Filters(driver);
+			help=new HelpCenter(driver);
+			login=new LoginPage(driver);
+			logOut=new Logout(driver);
+			myprofile=new MyProfile(driver);
+			place=new PlaceOrder(driver);
+			sbp=new SearchBar(driver);
+			w=new Wishlist(driver);
+			dashboard=new Dashboard(driver);
+			driver.get(url);
+	  }
+
 	@Test(priority=1)
-	public void login(String id,String password) throws InterruptedException, IOException {
-		driver.get(url);
-        driver.findElement(By.cssSelector("#desktop-header-cnt > div.desktop-bound > div.desktop-actions > div > div.desktop-userIconsContainer > span.myntraweb-sprite.desktop-iconUser.sprites-headerUser")).click();
-        driver.get(login_url);
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div[1]/input")).sendKeys(id);
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div[3]")).click();
-        
-        Thread.sleep(30000);
-        
-        
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div[3]")).click();
-        Thread.sleep(5000);
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div[3]/span")).click();
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div/form/div/div[2]/input")).sendKeys(password);
-        driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div/div[1]/div/div/form/div/div[3]/button")).click();
-        
-        
-        
-
+	public void login()
+	{
+		log.info("Login Test started");
+		log.info("Hovered profile icon");
+		
+		login.hoverProfile();
+		log.info("Clicked Login");
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[0][0]);
+		log.info("Entered the phone number");
+		login.clickContinue();
+		log.info("Clicked continue option.");
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		log.info("Enter the password.");
+		login.sendPassword(logindata[0][1]);
+		login.clickLoginButton();
+		log.info("Clicked the login button.");
+		log.info("Login test completed.");
 	}
 	
-	//Search Bar
 	@Test(priority=2)
-	  public void searchBarTestMeth() throws InterruptedException
-	  {
-
+	public void dashboard()
+	{
+		log.info("Dashboard Test started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println("Mens Tab present? "+dashboard.menTabMeth());
+		log.info("Mens Tab Present.");
+		
+		System.out.println("Womens Tab present? "+dashboard.womenTabMeth());
+		log.info("Womens Tab Present.");
+		
+		System.out.println("Kids Tab present? "+dashboard.kidsTabMeth());
+		log.info("Kids Tab Present.");
+		
+		System.out.println("Home and Living Tab present? "+dashboard.hnlTabMeth());
+		log.info("Home and Living Present.");
+		
+		System.out.println("beauty Tab present? "+dashboard.beautyTabMeth());
+		log.info("Dashboard test completed.");
+	}
 	
-	    	Thread.sleep(4000);
-		 
-	      //display the correct hint in the search box
-	      isHintText = driver.findElement(By.xpath("//input[contains(@placeholder,'Search for products, brands and more')]")).isDisplayed();
-	      System.out.println("is hint present?: "+isHintText);
-	      
-	    
-	      
-	      //positive testcase.
-	      driver.findElement(By.className("desktop-searchBar")).sendKeys("Kurtas");
-	      Thread.sleep(2000);
-	      driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[3]/a")).click();
-	     
-	      
-	      //optionsDisplayed = driver.findElement(By.className("title-title")).isDisplayed();
-	      optionsDisplayed = driver.findElement(By.tagName("h1")).isDisplayed();
-	      
-	      //Assert.assertEquals(optionsDisplayed, true);
-	      System.out.println("is the options dispalyed?"+optionsDisplayed);
-	      
-	      //negative testcase
-	      driver.findElement(By.className("desktop-searchBar")).clear();
-	      driver.findElement(By.className("desktop-searchBar")).sendKeys("12tbdhf\n");
-	      driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[3]/a")).click();
-	       errText = driver.findElement(By.className("title-corrections")).getText();
-	      System.out.println(errText);
-	      
-	      
-	      //enter the keyword by brand name.
-	      //positive testcase
-	      driver.findElement(By.className("desktop-searchBar")).clear();
-	      driver.findElement(By.className("desktop-searchBar")).sendKeys("puma\n");
-	      driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[3]/a")).click();
-	      
-	      //enter the keyword by brand name.
-	      //negative testcase
-	      driver.findElement(By.className("desktop-searchBar")).clear();
-	      driver.findElement(By.className("desktop-searchBar")).sendKeys("xyz\n");
-	      driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[3]/a")).click();
-	      incorrectBrandName = driver.findElement(By.className("index-infoBig")).getText();
-	      System.out.println("text displayed for incorrect brand name: "+ incorrectBrandName);
-	      isTextInCorrectBrandName = incorrectBrandName.equals("We couldn't find any matches!");
-	      System.out.println("is text for incorrect brand name present?:"+isTextInCorrectBrandName);
-	      
-	      Thread.sleep(4000);
-	  }
-	
-	//Filter
 	@Test(priority=3)
-    public void filter() throws InterruptedException {
-        //driver.get(url);
-          driver.findElement(By.xpath("//*[@id=\"desktop-header-cnt\"]/div[2]/div[3]/input")).sendKeys("tops");
-          driver.findElement(By.xpath("//*[@id=\"desktop-header-cnt\"]/div[2]/div[3]/a/span")).click();
-          Thread.sleep(1000);
-          //single filter
-          driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[3]/div[1]/section/div/div[2]/ul/li[1]/label")).click();
-          Thread.sleep(1000);
-          //clear
-          driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[3]/div[1]/section/div/div[1]/span[2]")).click();
-          Thread.sleep(1000);
-          //multiple filters
-          driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[3]/div[1]/section/div/div[2]/ul/li[1]/label")).click();
-          Thread.sleep(1000);
-          
-          JavascriptExecutor js = (JavascriptExecutor) driver;
-          js.executeScript("window.scrollBy(0,250)", "");
-          
-          Thread.sleep(1000);
-          driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[3]/div[1]/section/div/div[3]/ul/li[6]/label")).click();
-          driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[3]/div[1]/section/div/div[3]/ul/li[8]/label")).click();
-          Thread.sleep(1000);
-          
-                 
-          //display count of filters
-          heading = driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[2]/div/h1")).getText();
-          items = driver.findElement(By.xpath("//*[@id=\"mountRoot\"]/div/div[1]/main/div[2]/div/span")).getText();
-          System.out.println(heading+" "+items);
-          Thread.sleep(2000);
+	public void searchBar()
+	{
+		log.info("Search Bar Test Started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
 
-  
-  }
-	
-	
-	//My Profile 
-	@Test(priority=4)
-    public void myProfile() throws InterruptedException
- {
-		Thread.sleep(2000);
+		value1=sbp.isHintDisplayed();
+		System.out.println("is hint displayed? "+value1);
 		
-     Actions a =new Actions(driver);
-     WebElement profile = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[1]/span[2]"));
-     a.moveToElement(profile).perform();
-     
-     WebElement user = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[2]/div[2]/div[1]/a/div[1]"));
-     a.moveToElement(user).click().perform();
-     
-    
-      //profile options (displayed only when a user is logged in
-     profileHead = driver.findElement(By.className("profile-infoLabel")).getText();
-     //is the heading 'profile details' present
-     headPresent = profileHead.equals("Profile Details");
-     System.out.println("is the heading present? "+headPresent);
-     
-     //get the attribute and value of profile details
-     System.out.print(driver.findElement(By.xpath("//table/tbody/tr[1]/td[1]")).getText()+" ");
-     System.out.println(driver.findElement(By.xpath("//table/tbody/tr[1]/td[2]")).getText());
-     
-     System.out.print(driver.findElement(By.xpath("//table/tbody/tr[2]/td[1]")).getText()+" ");
-     System.out.println(driver.findElement(By.xpath("//table/tbody/tr[2]/td[2]")).getText());
-     
-     System.out.print(driver.findElement(By.xpath("//table/tbody/tr[3]/td[1]")).getText()+" ");
-     System.out.println(driver.findElement(By.xpath("//table/tbody/tr[3]/td[2]")).getText());
-     
-     System.out.print(driver.findElement(By.xpath("//table/tbody/tr[4]/td[1]")).getText()+" ");
-     System.out.println(driver.findElement(By.xpath("//table/tbody/tr[4]/td[2]")).getText());       
- }
-	//WishList
-	@Test(priority=5)
-    public void wishList() throws InterruptedException
-   {
-
-		Thread.sleep(2000);
+		value2 = sbp.getHintText();
+		System.out.println("Hint text val: "+value2);
 		
-	  driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/a[1]/span[1]")).click();
-	   Thread.sleep(2000);
-	  HeadLine=driver.findElement(By.className("index-headingDiv")).getText();
-	  System.out.println(HeadLine);
-	   Thread.sleep(2000);
-	  driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div[2]/ul/div[1]/div[1]/div")).click();
-	  Thread.sleep(2000);
-	      
-
-  
-   }
-	//Add To Cart
-	@Test(priority=6)
-	public void addToCart() throws InterruptedException, IOException {
-		String text1=driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div[1]/span[2]")).getText();
-		  System.out.println("My wishlist "+ text1);
-		  
-		  driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div[2]/ul/div[1]/div[2]/div[2]/span/a")).click();
-		  Thread.sleep(2000);
-		  driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div[2]/ul/div[1]/div[2]/div/div/div[3]/button[3]")).click();
-		  Thread.sleep(2000);
-		  driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div[2]/ul/div[1]/div[2]/div/div/div[5]")).click();
-		  
-		  driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/a[2]/span[1]")).click();
-		  
-		    //Take Screenshot
-	      	File src=((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-	      		
-	      	//copy the screenshot to the screenshot folder
-	      	FileUtils.copyFile(src, new File("ScreenShot\\defect_addToCart.png"));
-	      	
-		    Thread.sleep(3000);
-		  
-			String text=driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[1]/div[6]/div[2]")).getText();
-			System.out.println(text);
-	}
-
-	//Place an Order
-	@Test(priority=7)
-    public void placeOrder() throws InterruptedException
-    {
-       
-           Thread.sleep(5000);
-           
-           //click on place order button
-            WebElement ele=driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[2]/div[3]/button"));
-        
-            Actions action=new Actions(driver);
-            action.moveToElement(ele).click().perform();    
-            Thread.sleep(2000);
-            
-            // to display estimated date
-            System.out.println(driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[3]/div[2]/div[2]/div/div/div/div/span[1]")).getText());
-            System.out.println(driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[3]/div[2]/div[2]/div/div/div/div/span[2]")).getText());
-           
-            // to display total amount
-            System.out.println("Total Amount :" +driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[3]/div[4]/div[2]/div/div[4]/span[2]/span[2]")).getText());
-            
-                
-    }
-	
-	//My Orders
-	@Test(priority=8)
-	  public void myOrders() throws InterruptedException
-	  {
-	      
-		driver.navigate().back();
-	     Thread.sleep(2000);
+		sbp.searchBarKeyword("Tops");
+		System.out.println("is tops text displayed?"+sbp.isOptionsDisplayed());
+		System.out.println("Hint text val: "+value2);
+		sbp.clickSearchBar();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("entered the Tops keyword in the searchbar and clicked search.");
 		
-	     driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div/div/div/div/div[2]/div/div/div[3]/div[1]")).click();
-	     Thread.sleep(2000);
-	     driver.navigate().back();
-	     
-	  // mouse hover over profile
-	     Actions a =new Actions(driver);
-	     WebElement profile = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[1]/span[2]"));
-	     a.moveToElement(profile).perform();
-		
-	  
-		
-	     // click on orders
-	     WebElement order = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[2]/div[2]/div[2]/div[1]/a[1]/div"));
-	     a.moveToElement(order).click().perform();
-	     
-	     
-	     String detail=driver.findElement(By.xpath("/html/body/div[2]/div/div/div[3]/div[2]/div/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/span")).getText();
-	     Thread.sleep(2000);
-	     System.out.println(detail);
-	     
-	  // click on track
-	     Thread.sleep(5000);
-	     driver.findElement(By.xpath("/html/body/div[2]/div/div/div[3]/div[2]/div/div[1]/div/div[2]/div[2]/div[2]")).click();
-	     
-	     Thread.sleep(2000);
-	     // get text of track
-	     String expected_date=driver.findElement(By.xpath("/html/body/div[2]/div/div/div[3]/div[2]/div/div[1]/div/div[4]/div[2]/div/div[2]/div/div[5]/div[2]/div[2]")).getText();
-	     Thread.sleep(2000);
-	     System.out.println(expected_date);
-	     
-	     
-	     driver.findElement(By.xpath("/html/body/div[2]/div/div/div[3]/div[2]/div/div[1]/div/div[4]/div[2]/div/div[1]/div/div[2]/span")).click();
-	     Thread.sleep(2000);
-	     
-	     
-	
-	      
-	  }
-	
-	//Contact Us
-	@Test(priority=9)
-	public void contactUs() throws InterruptedException, IOException {
-		
-		 // mouse hover over profile
-	     Actions a =new Actions(driver);
-	     WebElement profile = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[1]/span[2]"));
-	     a.moveToElement(profile).perform();
-	     
-	     
-	  // click on contact us
-	     WebElement contact = driver.findElement(By.xpath("/html/body/div[1]/div/div/header/div[2]/div[2]/div/div[2]/div[2]/div[2]/div[1]/a[4]/div"));
-	     a.moveToElement(contact).click().perform();
-		
-		Thread.sleep(2000);
-		driver.findElement(By.xpath("//div[contains(text(),'Non-order Related Issues')]")).click();
-		Thread.sleep(2000);
-		
-		//printing all available options
-		query=driver.findElement(By.xpath("(//div[@class='oneLinerDesktop-infoAll'])[1]")).getText();
-		System.out.println(query);
-		
-		query1=driver.findElement(By.xpath("(//div[contains(text(),'Payment/Refund')])[1]")).getText();
-		System.out.println(query1);
-		
-		query2=driver.findElement(By.xpath("//div[contains(text(),'Offers, Discounts, Coupons')]")).getText();
-		System.out.println(query2);
-		
-		query3=driver.findElement(By.xpath("//div[contains(text(),'Manage Your Account')]")).getText();
-		System.out.println(query3);
-		
-		query4=driver.findElement(By.xpath("//div[contains(text(),'Other')]")).getText();
-		System.out.println(query4);
-		
-		//click on the Payment/Refund option
-		driver.findElement(By.xpath("(//div[contains(text(),'Payment/Refund')])[1]")).click();
-		Thread.sleep(1000);
-		
-		//click on the 'unable to use gift card option'
-		driver.findElement(By.xpath("//div[contains(@class,'query-genericQueryText')][contains(text(),'I am unable to use gift card')]")).click();
-		Thread.sleep(1000);
-		
-		//Printing available options
-		
-		chat=driver.findElement(By.xpath("//div[@class='option-text option-isDisabled']")).isEnabled();
-		System.out.println(chat);
-
-		Thread.sleep(1000);
-		
-		callNow=driver.findElement(By.xpath("//div[contains(text(),'Call Now')]")).isEnabled();
-		System.out.println(callNow);
-		
-		writeToUs=driver.findElement(By.xpath("//div[contains(text(),'Write To Us')]")).isEnabled();
-		System.out.println(writeToUs);
-		
-		
-		//Take Screenshot
-		File src=((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-		
-		//copy the screenshot to the screenshot folder
-		FileUtils.copyFile(src, new File("ScreenShot\\defect_contactUs.png"));
-		
-		
-		
-		//Testing Recent Issues
-		Thread.sleep(2000);
-		driver.findElement(By.xpath("//div[contains(text(),'Recent Issues')]")).click();
-		Thread.sleep(2000);
-		
-		
-		//Testing Frequently asked questions
-		Thread.sleep(2000);
-        driver.findElement(By.xpath("//div[6]//div[1]")).click();
-        Thread.sleep(2000);
-        
-        String termstext=driver.findElement(By.xpath("//div[@id='TnCQueries']")).getText();
-        System.out.println(termstext);
+		sbp.searchBarKeyword("12tbdhf\n");
+		sbp.clickSearchBar();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("entered the incorrect keyword in the searchbar and clicked search.");
 				
+		sbp.searchBarKeyword("puma\n");
+		System.out.println("Is the text displayed? "+sbp.isCorrectTextDisplayed());
+		
+		System.out.println("Text present is: "+sbp.getCorrectText());
+		
+		sbp.clickSearchBar();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("entered the correct brandname in the searchbar and clicked search.");
+		
+		sbp.searchBarKeyword("xyz\n");
+		sbp.clickSearchBar();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		//take screenshot 
+		
+		try {
+			sbp.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Incorrect BrandName: "+sbp.getIncorrectBrandName());
+		log.debug("entered the incorrect brandname in the searchbar and clicked search.");
+		log.info("Completed the search bar test.");
+		
 	}
 	
+	@Test(priority=4)
+	public void filters()
+	{
+		log.info("Started the filter test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		f.setSearch("tops");
+		f.clickSearch();
+		  title=f.getTitle();
+		  count=f.getCount();
+		  
+		  log.debug("Entered the keyword tops in the search bar.");
+		  System.out.println(title+"  "+count);
+		  
+		  f.clickFilter1();
+		  try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  title1=f.getTitle();
+		  count1=f.getCount();
+		  
+		  log.debug("Filtered the search items for the tops.Got the title and count.");		  
+ 
+		  System.out.println(title1+"  "+count1);
+		 
+		  log.debug("Entered the keyword tops in the search bar.");
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter2();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  log.debug("Filtered the results by applying men filter.");
+		  
+		  JavascriptExecutor js = (JavascriptExecutor) driver;
+	       js.executeScript("window.scrollBy(0,300)", "");
+	       driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter3();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter4();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  title2=f.getTitle();
+		  count2=f.getCount();
+		  
+		  log.debug("After applying multiple filter(girls and H&M and price)");
+		  System.out.println(title2+"  "+count2);
+		  
+		  f.clickClear();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  title3=f.getTitle();
+		  count3=f.getCount();
+		  
+		  log.debug("Applied multiple filters.");
+		  
+		  System.out.println(title3+"  "+count3);
+		  
+		  log.debug("Cleared all the filters.");
+		  log.info("Completed the filters test.");
+		
+		
+	}
+	
+	@Test(priority=5)
+	public void myProfile()
+	{	
+		log.info("Started MyProfile Test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		myprofile.hoverProfile();
+		myprofile.clickProfile();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
 
+    	log.info("Get the details present in the myprofile. ");
+		System.out.println(myprofile.getFullName());
+		
+		log.debug("Full Name Present.");
+		System.out.println(myprofile.getMobileNum());
+		
+		log.debug("Mobile Number Present");
+		System.out.println(myprofile.getEmail());
+		
+		log.debug("Email details Present.");
+		System.out.println(myprofile.getGender());
+		
+		log.debug("Gender details present");
+		System.out.println(myprofile.getDateOfBirth());
+		
+		log.debug("date of birth details present.");
+		System.out.print(myprofile.getLocation());
+		
+		log.debug("Location details Present.");
+		System.out.println(myprofile.getHint());;
+		log.debug("Hint present.");
+		log.info("All the details of myprofile present.");
+		
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("window.scrollBy(0,250)", "");
+	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	    myprofile.clickEdit();
+		log.debug("Clicked edit.");
+	    myprofile.setAlternateMobile("9146134449");
+	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	    myprofile.clickSave();
+	    log.debug("Entered the alternate mobile number and saved.");
+	    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	    myprofile.clickClose();
+	    log.debug("Clicked the close.");
+		log.info("MyProfile Test completed.");
+	}
+
+	@Test(priority=6)
+	public void wishlist()
+	{
+		log.info("Wishlist test started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+        w.WishList_click();
+        log.debug("Clicked the wishlist.");
+        System.out.println(w.Head_title());
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+        w.Remove_item1();
+        log.debug("Removed the item");
+        
+        //Take screenshots
+        
+        try {
+			w.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+        log.info("Items after removing item");
+        System.out.println(w.Head_title());
+        log.info("Completed the wishlist test.");
+	}
+	
+	@Test(priority=7)
+	public void addToCart() throws InterruptedException
+	{   
+		log.info("Started the add to cart test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickItem1();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickSize1();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickDone();
+		 log.debug("Clicked the item, size and submitted.Item Added.");
+		 
+		 // Take Screenshot
+		 try {
+			a.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		 
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickBag();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 JavascriptExecutor js = (JavascriptExecutor) driver;
+		 js.executeScript("window.scrollBy(0,200)", "");
+		      
+		 driver.navigate().back();
+		      
+		 a.clickItem2();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickSize2();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickDone();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 log.debug("Second Item Added.");
+		      
+		 a.clickBag();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 js.executeScript("window.scrollBy(0,200)", "");
+		 log.info("WishList test completed.");
+	}
+	
+	@Test(priority=8)
+	public void placeOrder()
+	{
+		log.info("Place order test started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		System.out.println(place.getTotalAmount());
+		place.clickPlaceOrder();
+		log.debug("Fetched the total Amount and clicked to place the order.");
+		
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println("Estimated Delivery By");
+		System.out.println(place.getDate());
+		
+		System.out.println("Address Details:");		
+		
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println(place.getAddress1());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println(place.getContactDetails());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Details of the delivery, address, contact details present.");
+		
+		driver.navigate().back();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		place.clickGoBack();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		driver.navigate().back();
+		log.debug("Navigated back.");
+		log.info("Completed the Placeorder test.");
+
+	}
+	
+	@Test(priority=9)
+	public void myOrders()
+	{
+		log.info("Started the My Orders Test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		order.hoverProfile();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.hoverOrder();
+		
+		log.debug("Hovered my profile and order.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+		order.clickOrder1();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		System.out.println(order.checkStatus1());
+		System.out.println(order.checkStatus2());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Clicked orders and checked the status.");
+		
+		order.clickExchange();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickClose1();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickReturn();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Clicked the exchange.");
+		
+		order.clickClose2();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		driver.navigate().back();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickReview();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.setReview("Product and its material is good");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickClose3();
+		
+		log.debug("Clicked the review, set the review and closed.");
+		log.info("Completed the myorder test.");
+	}
+	
+	@Test(priority=10)
+	public void helpCenter()
+	{
+				log.info("Contact Us test started.");
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+				
+				help.hoverProfile();
+				help.contact();
+				help.nonOrder();
+				
+				//getting all options
+				header = help.getOption();
+				System.out.println(header);
+				
+				text1 = help.getOption1();
+				System.out.println(text1);
+				
+				text2 = help.getOption2();
+				System.out.println(text2);
+				
+				text3 = help.getOption3();
+				System.out.println(text3);
+				
+				text4 = help.getOption4();
+				System.out.println(text4);
+				
+				//click on payment(option1)
+				help.clickOption1();
+				
+				//click on the 'unable to use gift card option'
+				help.clickGift();
+				
+				chat = help.getChat();
+				System.out.println(chat);
+				
+				callNow = help.getCall();
+				System.out.println(callNow);
+				
+				// take screenshots
+				
+				try {
+					help.takeScreenshot();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				help.getIssues();
+				
+				help.getFAQ();
+				
+				ButtonCount = help.getButtonCount();
+			    System.out.println(ButtonCount);		
+				
+				JavascriptExecutor js = (JavascriptExecutor) driver;
+			    js.executeScript("window.scrollBy(0,800)", "");
+			    log.info("Completed the Help Center test.");
+	}
+	
+	@Test(priority=11)
+	public void logout()
+	{
+		log.info("Started the logout test");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		logOut.hoverProfile1();
+		logOut.clickLogOut();
+		log.info("Completed the logout test.");
+	}
 	
 	@AfterTest
-	public void tearDown() {
-		//driver.quit();
+	public void tearDown()
+	{
+		driver.quit();
 	}
-	
 }
+
