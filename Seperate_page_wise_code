@@ -1,0 +1,1489 @@
+// Login page (with DDT )
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.LoginPage;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class LoginWithDDT {
+	
+
+	WebDriver driver;
+	WebDriverPage web;
+    public static String url="https://www.myntra.com/";
+    public int i=0,j=0;
+	LoginPage login;
+	String logindata[][];
+	TestReadExcel test;
+    Logger log = LogManager.getLogger(TestAddToCart.class.getName());
+	
+	 @BeforeTest
+	  public void test() {
+		  	web=new WebDriverPage(driver);
+			driver=web.setBrowser("firefox");
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			driver.manage().window().maximize();
+			driver.get(url);
+			
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	  }
+  @Test
+  public void login() {
+	  
+	  
+	  for(i=0;i<5;i++)
+	  {
+		  for(j=0;j<=i;j++)
+		  {
+			  //login using DDT
+			  log.info("Login Test started");
+				log.info("Hovered profile icon");
+				
+				login.hoverProfile();
+				log.info("Clicked Login");
+				login.hoverProfile();
+				login.clickLogin();
+				login.sendMobileNo(logindata[i][j]);
+				log.info("Entered the phone number");
+				login.clickContinue();
+				log.info("Clicked continue option.");
+				try {
+					Thread.sleep(30000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				login.clickContinue();
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+				login.clickPassword();
+				log.info("Enter the password.");
+				login.sendPassword(logindata[i][j+1]);
+				login.clickLoginButton();
+				log.info("Clicked the login button.");
+				log.info("Login test completed.");
+		  }
+	  }	  
+	  
+  }
+  
+  @AfterTest
+  public void afterTest() {
+      driver.close();
+  }
+}
+
+
+// login page with multiple test cases and DDT
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.poi.EncryptedDocumentException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.LoginPage;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+public class TestLoginPage {
+
+	WebDriver driver;
+	String url="https://www.myntra.com/";
+	LoginPage login;
+	WebDriverPage web;
+	//PageReadExcel read;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(TestLoginPage.class.getName());
+	
+	 @BeforeTest
+	  public void test(){
+		 web=new WebDriverPage(driver);
+			driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+		        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+	  }
+	 
+	 @Test
+		public void loginTest(){
+		 
+		 driver.get(url);	
+		 log.info("Login Test started");			 
+		// Login with invalid credentials (Wrong mobile number)
+		 
+		 log.info("Hovered profile icon");
+			
+		 login.hoverProfile();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLogin();
+		 log.info("Clicked Login");
+		 login.sendMobileNo("89838383");
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 System.out.println(login.getErrorMessage());
+		 log.info("Got error message for wrong mobile number");
+		 
+		//If limit exceeds for a particular user
+		 login.clearMobileNo();
+		 login.sendMobileNo(logindata[2][0]);
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 log.info("Entered the phone number");
+		 
+		 try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e1) {
+			
+			e1.printStackTrace();
+		}
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 
+		 try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e1) {
+				
+				e1.printStackTrace();
+			}
+		 log.info("login when OTP limit exceeds");
+		 int i;
+		 for(i=0;i<2;i++)
+		 {
+			 login.resendButton();
+			 try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				
+				e.printStackTrace();
+			}
+		 }
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.resendButton();
+		 login.takeScreenshot2();
+		 log.info("OTP limit exceeded");
+		 
+		// Login with invalid credentials (Wrong password)
+		
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickPassword();
+		 login.sendPassword("Admin");
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLoginButton();
+		 login.takeScreenshot1();
+		 log.info("Entered password is wrong");
+		 				 
+		 //Login with valid credentials
+		 try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 login.clearPassword();
+		 login.sendPassword(logindata[2][1]);
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLoginButton();
+		 
+
+		 log.info("Clicked the login button.");
+		 log.info("Login test completed.");
+		 		 		 
+	 }
+	 
+		@AfterTest
+		public void close() {
+			driver.quit();
+		}
+    
+}
+
+
+// Dashboard page
+
+package tests;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.Dashboard;
+import pages.MyOrders;
+import utils.WebDriverPage;
+
+public class TestDashboard {
+	
+	Dashboard dashboard;
+	WebDriverPage web;
+	WebDriver driver ;
+	String url="https://www.myntra.com/";
+	
+	Logger log = LogManager.getLogger(TestDashboard.class.getName());
+
+
+	
+	@BeforeTest
+	  public void test() {
+			web=new WebDriverPage(driver);
+			driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			dashboard=new Dashboard(driver);
+			driver.get(url);
+			log.info("-----Dashboard Test Page-----");
+			log.info("Dashboard Test started");
+
+	  }
+	
+	@Test
+	public void dashboardTest()
+	{
+		//Check if all elements are displayed in dashboad
+		log.info("Dashboard Test started.");
+		
+		System.out.println("Mens Tab present? "+dashboard.menTabMeth());	
+		log.info("Mens Tab Present.");
+		
+		System.out.println("Mens Tab present? "+dashboard.menTabMeth());
+		log.info("Mens Tab Present.");
+		
+		System.out.println("Womens Tab present? "+dashboard.womenTabMeth());
+		log.info("Womens Tab Present.");
+		
+		System.out.println("Kids Tab present? "+dashboard.kidsTabMeth());
+		log.info("Kids Tab Present.");
+		
+		System.out.println("Home and Living Tab present? "+dashboard.hnlTabMeth());
+		log.info("Home and Living Present.");
+		
+		System.out.println("beauty Tab present? "+dashboard.beautyTabMeth());
+		log.info("Beauty Tab Present.");
+		
+		System.out.println("Studio Tab present? "+dashboard.studioTabMeth());
+		log.info("Studio Tab Present.");
+		
+		//if beauty tab is present click on it
+		if(dashboard.beautyTabMeth())
+		{
+			dashboard.clickBeautyTab();
+		}
+		log.info("In the beauty Tab");
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("window.scrollBy(0,500)", "");
+	    
+	    driver.navigate().back();
+	    
+	    ////if studio tab is present click on it
+	    if(dashboard.studioTabMeth())
+	    {
+	    	dashboard.clickStudioTab();
+	    }
+		log.info("In the Studio Tab");
+	    js.executeScript("window.scrollBy(0,500)", "");
+	    driver.navigate().back();
+	    
+	}
+		
+	@AfterTest
+	public void quit()
+	{
+		log.info("Completed Dashboard test.");
+		driver.quit();
+	}
+}
+
+
+// Search bar page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.SearchBar;
+import utils.WebDriverPage;
+
+public class TestSearchBar {
+	SearchBar sbp;
+	WebDriver driver;
+	WebDriverPage web;
+	Logger log = LogManager.getLogger(TestSearchBar.class.getName());
+	boolean value1;
+	
+	String value2;
+	
+	String url="https://www.myntra.com/";
+	
+	@BeforeTest
+	  public void searchBar() {
+		web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+			sbp=new SearchBar(driver); 
+	  }
+	
+	@Test
+	public void test(){
+				
+		driver.get(url);
+		
+		log.info("Search Bar Test Started.");
+		
+		//To check if hint to search is displayed
+		value1=sbp.isHintDisplayed();
+		System.out.println("is hint displayed? "+value1);
+		
+		value2 = sbp.getHintText();
+		System.out.println("Hint text val: "+value2);
+		
+		// to search with valid product
+		sbp.searchBarKeyword("Tops");
+		System.out.println("is tops text displayed?"+sbp.isOptionsDisplayed());
+		sbp.clickSearchBar();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		log.debug("entered the Tops keyword in the searchbar and clicked search.");
+		
+		//To search with some letter and check if it gives hint
+		sbp.searchBarKeyword("12tbdhf\n");		
+		sbp.clickSearchBar();
+		log.debug("entered the incorrect keyword in the searchbar and clicked search.");
+		
+		//To search by entering brand name
+		sbp.searchBarKeyword("puma\n");
+		System.out.println("Is the text displayed? "+sbp.isCorrectTextDisplayed());
+		System.out.println("Text present is: "+sbp.getCorrectText());
+		sbp.clickSearchBar();
+		log.debug("entered the correct brandname in the searchbar and clicked search.");
+		
+		//To search by entering invalid data
+		sbp.searchBarKeyword("xyz\n");
+		sbp.clickSearchBar();
+		System.out.println("Incorrect BrandName: "+sbp.getIncorrectBrandName());
+		try {
+			sbp.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
+		log.debug("entered the incorrect brandname in the searchbar and clicked search.");
+		log.info("Completed the search bar test.");
+	}
+	
+	@AfterTest
+	void quitDriver()
+	{
+		driver.quit();
+	}
+
+}
+
+
+// Filter page
+
+package tests;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.Filters;
+import utils.WebDriverPage;
+
+public class TestFilters {
+	WebDriver driver;
+    public static String url="https://www.myntra.com/";
+	public static String title,count,title1,count1,title2,count2,title3,count3;
+	Filters f;
+	WebDriverPage web;
+	Logger log = LogManager.getLogger(TestFilters.class.getName());
+	
+  @BeforeTest
+  public void beforeTest() {
+	 web=new WebDriverPage(driver);
+	 driver=web.setBrowser("firefox");
+     driver.manage().window().maximize();
+     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+     driver.get(url);
+     f = new Filters(driver);
+  }
+  
+  @Test
+  public void f(){
+	  
+	  log.info("Started the filter test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		f.setSearch("tops");
+		f.clickSearch();
+		  title=f.getTitle();
+		  count=f.getCount();
+		  
+		  log.debug("Entered the keyword tops in the search bar.");
+		  System.out.println(title+"  "+count);
+		  
+		  f.clickFilter1();
+		  try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  title1=f.getTitle();
+		  count1=f.getCount();
+		  
+		  log.debug("Filtered the search items for the tops.Got the title and count.");		  
+
+		  System.out.println(title1+"  "+count1);
+		 
+		  log.debug("Entered the keyword tops in the search bar.");
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter2();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  log.debug("Filtered the results by applying men filter.");
+		  
+		  JavascriptExecutor js = (JavascriptExecutor) driver;
+	       js.executeScript("window.scrollBy(0,300)", "");
+	       driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter3();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  f.clickFilter4();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		  title2=f.getTitle();
+		  count2=f.getCount();
+		  
+		  log.debug("After applying multiple filter(girls and H&M and price)");
+		  System.out.println(title2+"  "+count2);
+		  
+		  f.clickClear();
+		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+
+		  title3=f.getTitle();
+		  count3=f.getCount();
+		  
+		  log.debug("Applied multiple filters.");
+		  
+		  System.out.println(title3+"  "+count3);
+		  
+		  log.debug("Cleared all the filters.");
+		  log.info("Completed the filters test.");
+  }
+
+  @AfterTest
+  public void afterTest() {
+	  driver.close();
+  }
+
+}
+
+
+// My profile page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.LoginPage;
+import pages.MyProfile;
+import pages.PlaceOrder;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class TestMyProfile {
+  
+	WebDriver driver ;
+	MyProfile myprofile;
+	String url="https://www.myntra.com/";
+	LoginPage login;
+	WebDriverPage web;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(TestMyProfile.class.getName());
+	
+	@BeforeTest
+	  public void test() {
+		web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+			myprofile=new MyProfile(driver);
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			driver.get(url);
+	  }
+
+	@Test
+	void myProfileTest()
+	{
+		
+		//Login
+		
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[3][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[3][1]);
+		login.clickLoginButton();
+		
+		//To get all the details of user
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//My profile
+		
+		log.info("Started MyProfile Test.");
+		myprofile.hoverProfile();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		myprofile.clickProfile();    
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(100));
+		
+		log.info("Get the details present in the myprofile. ");
+		System.out.println(myprofile.getFullName());
+		
+		System.out.println(myprofile.getMobileNum());
+		
+		System.out.println(myprofile.getEmail());
+		
+		System.out.println(myprofile.getGender());
+		
+		System.out.println(myprofile.getMobileNum());
+		
+		System.out.print(myprofile.getLocation());
+		
+		System.out.println(myprofile.getHint());
+		
+		//edit the details and add mobile number
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("window.scrollBy(0,250)", "");
+	    
+	    myprofile.clickEdit();
+	    myprofile.setAlternateMobile("9146134449");
+	    log.debug("Entered the alternate mobile number and saved.");
+	    
+	    //save the details
+	    myprofile.clickSave();   
+	    myprofile.clickClose();
+	    log.info("Saved the detials");
+	    
+	    // change the password 
+	    log.info("Trying to change the password");
+	    myprofile.changePassButton();
+	    myprofile.clickCancel();
+	    log.debug("Clicked the close.");
+		log.info("MyProfile Test completed.");
+	    
+	}
+		
+	@AfterTest
+	public void quit()
+	{
+		driver.quit();
+	}
+}
+
+
+// Wishlist page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import pages.LoginPage;
+import pages.Wishlist;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class TestWishlist {
+	 
+	WebDriver driver;
+	    public static String url="https://www.myntra.com/";
+	    public static String HeadLine;
+	    Wishlist w;
+	    LoginPage login;
+	    WebDriverPage web;
+	    String logindata[][];
+		TestReadExcel test;
+	    Logger log = LogManager.getLogger(TestWishlist.class.getName());
+	    
+	    @BeforeTest
+		  public void test() {
+	    	web=new WebDriverPage(driver);
+			driver=web.setBrowser("firefox");
+				driver.manage().window().maximize();
+				driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+				w=new Wishlist(driver);
+				login=new LoginPage(driver);
+				test=new TestReadExcel();
+		        
+			    try {
+					logindata= test.testWeb();
+				} catch (EncryptedDocumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				driver.get(url);
+		  }
+	    
+	    @Test(priority=1)
+	    public void wishlist(){
+	    	
+	    	//Login
+	    	
+	    	login.hoverProfile();
+			login.clickLogin();
+			login.sendMobileNo(logindata[1][0]);
+			
+			login.clickContinue();
+			
+			try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			login.clickContinue();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+			login.clickPassword();
+			
+			login.sendPassword(logindata[1][1]);
+			login.clickLoginButton();
+			
+			
+			//Wishlist
+			
+			log.info("Wishlist test started.");
+	    	
+	        try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	        w.WishList_click();
+	        log.debug("Clicked the wishlist.");
+	        
+	        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	        System.out.println(w.Head_title());
+	        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	        
+	        w.Remove_item1();
+	        log.debug("Removed the item");
+	        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+	        
+	        try {
+				w.takeScreenshot();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        log.info("Screenshot is taken");
+	        
+	        System.out.println(w.Head_title());
+	        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));	        
+	        System.out.println(w.getOutOfStock());
+	        log.info("Count displayed for out of stock items");
+	        log.info("Completed the wishlist test");
+	    }
+
+	   @AfterTest
+	    public void tearDown(){
+	        driver.quit();
+	    }
+	    
+}
+
+
+// Add to cart page
+
+  package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import combinedcode.IntegratedCode;
+import pages.AddToCart;
+import pages.LoginPage;
+import pages.MyOrders;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class TestAddToCart {
+  
+	WebDriver driver;
+	WebDriverPage web;
+    public static String url="https://www.myntra.com/";
+    public static String loginUrl="https://www.myntra.com/login?referer=https://www.myntra.com/";
+    AddToCart a;
+    LoginPage login;
+    String logindata[][];
+	TestReadExcel test;
+    Logger log = LogManager.getLogger(TestAddToCart.class.getName());
+
+  @BeforeTest
+  public void test() {
+	  	web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+		driver.manage().window().maximize();
+		driver.get(url);
+		a=new AddToCart(driver);
+		login=new LoginPage(driver);
+		test=new TestReadExcel();
+        
+	    try {
+			logindata= test.testWeb();
+		} catch (EncryptedDocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  }
+
+
+ @Test
+  public void addTocart() {
+	 
+      JavascriptExecutor js = (JavascriptExecutor) driver;
+      
+      //Login
+      login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[0][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[0][1]);
+		login.clickLoginButton();
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		a.clickWishlist();
+      
+      //Adding single item
+      log.info("Started the add to cart test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickItem1();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickSize1();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickDone();
+		 log.debug("Clicked the item, size and submitted.Item Added.");
+		 
+		 // Take Screenshot
+		 try {
+			a.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickBag();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		 js.executeScript("window.scrollBy(0,200)", "");
+		      
+		 driver.navigate().back();
+		  
+		 //adding multiple items
+		 a.clickItem2();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickSize2();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 a.clickDone();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 log.debug("Second Item Added.");
+		      
+		 a.clickBag();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		 js.executeScript("window.scrollBy(0,200)", "");
+		 
+		 //By adding single item multiple times
+		 a.clickQuantity();
+		 a.clickDoneButton();
+		 log.info("Add to cart test completed");
+        
+  }
+  
+  @AfterTest
+  public void afterTest() {
+      driver.close();
+  }
+
+
+}
+
+
+// Place order page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import combinedcode.IntegratedCode;
+import pages.LoginPage;
+import pages.PlaceOrder;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+public class TestPlaceOrder {
+ 
+	WebDriver driver;
+	String url="https://www.myntra.com/";
+	PlaceOrder place;
+	LoginPage login;
+	WebDriverPage web;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(TestPlaceOrder.class.getName());
+	
+	
+	@BeforeTest
+	  public void test() {
+		web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			place=new PlaceOrder(driver);
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	  }
+
+	@Test
+	public void placeOrder()
+	{
+		driver.get(url);
+		
+		//Login
+		
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[1][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[1][1]);
+		login.clickLoginButton();
+		
+		//Place order
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		place.clickBagIcon();
+		
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.info("Place order test started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		System.out.println(place.getTotalAmount());
+		place.clickPlaceOrder();
+		log.debug("Fetched the total Amount and clicked to place the order.");
+		
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println("Estimated Delivery By");
+		System.out.println(place.getDate());
+		
+		System.out.println("Address Details:");		
+		
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println(place.getAddress1());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		System.out.println(place.getContactDetails());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Details of the delivery, address, contact details present.");
+		
+		driver.navigate().back();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		place.clickGoBack();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		driver.navigate().back();
+		log.debug("Navigated back.");
+		log.info("Completed the Placeorder test.");
+	}
+	
+	@AfterTest
+	public void quit()
+	{
+	 	driver.quit();
+	}
+}
+
+
+// My orders page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import combinedcode.IntegratedCode;
+import pages.LoginPage;
+import pages.MyOrders;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+
+public class TestMyOrders {
+	WebDriver driver;
+	String url="https://www.myntra.com/";
+	MyOrders order;
+	LoginPage login;
+	WebDriverPage web;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(TestMyOrders.class.getName());
+	
+	@BeforeTest
+	  public void test() {
+		web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			order=new MyOrders(driver);
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	  }
+
+	@Test
+	public void myOrder() throws InterruptedException
+	{
+		driver.get(url);
+		
+		//Login
+		
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[0][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[0][1]);
+		login.clickLoginButton();
+		
+		//My orders
+		
+		Thread.sleep(4000);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+	
+		log.info("Started the My Orders Test.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		order.hoverProfile();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.hoverOrder();
+		
+		log.debug("Hovered my profile and order.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+		order.clickOrder1();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		System.out.println(order.checkStatus1());
+		System.out.println(order.checkStatus2());
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Clicked orders and checked the status.");
+		
+		order.clickExchange();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickClose1();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickReturn();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		log.debug("Clicked the exchange.");
+		
+		order.clickClose2();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		driver.navigate().back();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickReview();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.setReview("Product and its material is good");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		order.clickClose3();
+		
+		log.debug("Clicked the review, set the review and closed.");
+		log.info("Completed the myorder test.");
+	}
+	@AfterTest
+	public void tearDown()
+	{
+		driver.quit();
+	}
+}
+
+
+// Help Center page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import combinedcode.IntegratedCode;
+
+import pages.HelpCenter;
+import pages.LoginPage;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+
+
+public class TestHelpCenter {
+	WebDriver driver;
+	String url="https://www.myntra.com/";
+	String header,text1,text2,text3,text4;
+	boolean chat,callNow,writeToUs;
+	int ButtonCount;
+	HelpCenter help;
+	LoginPage login;
+	WebDriverPage web;
+	String logindata[][];
+	TestReadExcel test;
+
+	
+	Logger log = LogManager.getLogger(TestHelpCenter.class.getName());
+	
+	
+	@BeforeTest
+	  public void test() {
+		   web=new WebDriverPage(driver);
+		   driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			help=new HelpCenter(driver);			
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	  }
+	
+	
+	@Test(priority=1)
+	public void helpTest(){
+		
+		driver.get(url);
+		// login
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[0][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[0][1]);
+		login.clickLoginButton();
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+		// Help center
+		
+		log.info("Contact Us test started.");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		
+		help.hoverProfile();
+		help.contact();
+		help.nonOrder();
+		
+		//getting all options
+		header = help.getOption();
+		System.out.println(header);
+		
+		text1 = help.getOption1();
+		System.out.println(text1);
+		
+		text2 = help.getOption2();
+		System.out.println(text2);
+		
+		text3 = help.getOption3();
+		System.out.println(text3);
+		
+		text4 = help.getOption4();
+		System.out.println(text4);
+		
+		//click on payment(option1)
+		help.clickOption1();
+		
+		//click on the 'unable to use gift card option'
+		help.clickGift();
+		
+		chat = help.getChat();
+		System.out.println(chat);
+		
+		callNow = help.getCall();
+		System.out.println(callNow);
+		
+		// take screenshots
+		
+		try {
+			help.takeScreenshot();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		help.getIssues();
+		
+		help.getFAQ();
+		
+		ButtonCount = help.getButtonCount();
+	    System.out.println(ButtonCount);		
+		
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("window.scrollBy(0,800)", "");
+	    log.info("Completed the Help Center test.");
+	
+	}
+	@AfterTest
+	public void close() {
+		driver.quit();
+	}
+}
+
+
+// Logout page
+
+package tests;
+
+import java.io.IOException;
+import java.time.Duration;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+
+import pages.LoginPage;
+import pages.Logout;
+import utils.TestReadExcel;
+import utils.WebDriverPage;
+
+
+public class TestLogout {
+  
+	WebDriver driver;
+	String url="https://www.myntra.com/";
+	Logout logOut;
+	LoginPage login;
+	WebDriverPage web;
+	String logindata[][];
+	TestReadExcel test;
+	Logger log = LogManager.getLogger(TestLogout.class.getName());
+	
+	@BeforeTest
+	  public void test() {
+		web=new WebDriverPage(driver);
+		driver=web.setBrowser("firefox");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+			logOut=new Logout(driver);
+			login=new LoginPage(driver);
+			test=new TestReadExcel();
+	        
+		    try {
+				logindata= test.testWeb();
+			} catch (EncryptedDocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	  }
+	
+	@Test
+	public void logOutTest(){
+		
+		//Login
+		login.hoverProfile();
+		login.clickLogin();
+		login.sendMobileNo(logindata[4][0]);
+		
+		login.clickContinue();
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		login.clickContinue();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
+		login.clickPassword();
+		
+		login.sendPassword(logindata[4][1]);
+		login.clickLoginButton();
+		
+		//Logout
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		log.info("Started the logout test");
+		logOut.hoverProfile1();
+		logOut.clickLogOut();
+		log.info("Completed the logout test.");
+	}
+	
+	@AfterTest
+	public void close() {
+		driver.quit();
+	}
+}
+
