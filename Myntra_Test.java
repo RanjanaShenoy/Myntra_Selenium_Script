@@ -13,8 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -35,7 +33,6 @@ import pages.MyProfile;
 import pages.PlaceOrder;
 import pages.SearchBar;
 import pages.Wishlist;
-import tests.TestDashboard;
 import utils.TestReadExcel;
 import utils.WebDriverPage;
 
@@ -76,7 +73,7 @@ public class IntegratedCode {
 
 			driver.manage().window().maximize();
 			//driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-			driver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
+		
 			
 			log.info("-----Test Started-----");
 			test=new TestReadExcel();
@@ -106,31 +103,87 @@ public class IntegratedCode {
 	@Test(priority=1)
 	public void login()
 	{
-		log.info("Login Test started");
-		log.info("Hovered profile icon");
-		
-		login.hoverProfile();
-		log.info("Clicked Login");
-		login.hoverProfile();
-		login.clickLogin();
-		login.sendMobileNo(logindata[0][0]);
-		log.info("Entered the phone number");
-		login.clickContinue();
-		log.info("Clicked continue option.");
-		try {
+				 	
+		 log.info("Login Test started");			 
+		// Login with invalid credentials (Wrong mobile number)
+		 
+		 log.info("Hovered profile icon");
+			
+		 login.hoverProfile();
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLogin();
+		 log.info("Clicked Login");
+		 login.sendMobileNo("89838383");
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 System.out.println(login.getErrorMessage());
+		 log.info("Got error message for wrong mobile number");
+		 
+		//If limit exceeds for a particular user
+		 login.clearMobileNo();
+		 login.sendMobileNo(logindata[2][0]);
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 log.info("Entered the phone number");
+		 
+		 try {
 			Thread.sleep(30000);
+		} catch (InterruptedException e1) {
+			
+			e1.printStackTrace();
+		}
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickContinue();
+		 
+		 try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e1) {
+				
+				e1.printStackTrace();
+			}
+		 log.info("login when OTP limit exceeds");
+		 int i;
+		 for(i=0;i<2;i++)
+		 {
+			 login.resendButton();
+			 try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				
+				e.printStackTrace();
+			}
+		 }
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.resendButton();
+		 login.takeScreenshot2();
+		 log.info("OTP limit exceeded");
+		 
+		// Login with invalid credentials (Wrong password)
+		
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickPassword();
+		 login.sendPassword("Admin");
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLoginButton();
+		 login.takeScreenshot1();
+		 log.info("Entered password is wrong");
+		 				 
+		 //Login with valid credentials
+		 try {
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		login.clickContinue();
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(50));
-		login.clickPassword();
-		log.info("Enter the password.");
-		login.sendPassword(logindata[0][1]);
-		login.clickLoginButton();
-		log.info("Clicked the login button.");
-		log.info("Login test completed.");
+		 login.clearPassword();
+		 login.sendPassword(logindata[2][1]);
+		 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
+		 login.clickLoginButton();
+		 
+
+		 log.info("Clicked the login button.");
+		 log.info("Login test completed.");
+		 		 		 
 	}
 	
 	@Test(priority=2)
